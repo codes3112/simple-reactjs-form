@@ -47,7 +47,7 @@ const Input =(props) => {
             value={props.value}
             onChange={props.handleChange}
             placeholder={props.placeholder}
-            required/> 
+            noValidate/> 
             :
             <input
             className="form-control"
@@ -56,6 +56,7 @@ const Input =(props) => {
             value={props.value}
             onChange={props.handleChange}
             placeholder={props.placeholder}
+            noValidate
             />}
         
         

@@ -10,40 +10,114 @@ export default class form extends Component {
             lastName:'',
             email:'',
             empId:'',
-            city:''
+            city:'',
+            massage:{
+                name:'',
+                error:''
+            },
+            emailIsValid:false
+        
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleClear= this.handleClear.bind(this);
         this.handleChange= this.handleChange.bind(this);
         this.sendData=this.sendData.bind(this);
+        
     }
+    sendData = (message) => {
+        this.props.callBackFromParent(message);
+   }
+    
     handleChange=(e)=>{
-        let name= e.target.name;
-        let value= e.target.value;
+        // let name= e.target.name;
+        // let value= e.target.value;
+        const validEmailRegex = 
+            RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
+        const {name,value}=e.target;
+        console.log("name:",name,"value:", value, "email test", validEmailRegex.test(value));
         this.setState({
             [name]:value
-        })
+        });
+        let message = {...this.state.massage}
+                switch (name) {
+                        case 'firstName': 
+                        
+                        message.error=value.length<2 ? 'You First Name must be atleast 2 characters' : ''
+                        this.setState({message});
+                        this.sendData(message);
+            
+                        break;
+                        case 'lastName': 
+                        
+                        //this.sendData({error:'You First Name must be atleast 2 characters'}):this.sendData({error:''})
+                        message.error= value.length<2 ?'You Last Name must be atleast 2 characters' : ''
+                        this.setState({message});
+                        this.sendData(message);
+                        break;
+                        case 'email': 
+                        
+                        //this.sendData('Please enter valid Email'):this.sendData('')
+                        message.error= !validEmailRegex.test(value)?'Please enter valid Email' : ''
+                        validEmailRegex.test(value)? this.setState({emailIsValid:true}) : this.setState({emailIsValid:false})
+                        this.setState({message});
+                        this.sendData(message);
+                        break;
+                        default:
+                        break;
+                    }
+        
+
     }
     
     handleSubmit = (e)=>{
+        
         e.preventDefault();
-        this.sendData(this.state.firstName);
-        this.handleClear();
+        let message = {...this.state.massage}
+        if(this.state.firstName.length>=2 && this.state.lastName.length>=2 && this.state.emailIsValid){
+            message.name= this.state.firstName;
+            message.error='';
+            this.sendData(message);
+            this.handleClear(e);
+        }else{
+            console.log("Check Submission name:",this.state.firstName>=2,"lastname",this.state.lastName>=2,"email", this.state.emailIsValid)
+            if(this.state.firstName.length<2){
+                message.error= "Error: You must enter your First Name "; 
+                this.setState({message});
+                this.sendData(message); 
+            }
+            else if(this.state.lastName.length<2){
+                message.error= "Error: You must enter your Last Name "; 
+                this.setState({message});
+                this.sendData(message); 
+            }else if(!this.state.emailIsValid){
+                message.error= "Error: You must enter a valid Email "; 
+                this.setState({message});
+                this.sendData(message); 
+            }
+            
+            
+        }
+        
+        
 
     }
     handleClear = (e)=>{
+        e.preventDefault();
         this.setState({
             firstName:'',
             lastName:'',
             email:'',
             empId:'',
-            city:''
+            city:'',
+            massage:{
+                name:'',
+                error:''
+            },
+            emailIsValid:false
         })
 
     }
-    sendData = (name) => {
-        this.props.callBackFromParent(name);
-   }
+    
     render() {
         console.log("props in Form:", this.props)
         return (
@@ -55,7 +129,7 @@ export default class form extends Component {
                     title= {'First Name'} 
                     name= {'firstName'}
                     value={this.state.firstName} 
-                    placeholder = {'Enter your first name'}
+                    placeholder = {'Enter your first name (required)'}
                     handleChange = {this.handleChange}
                     required={true}
                />
@@ -65,7 +139,7 @@ export default class form extends Component {
                     title= {'Last Name'} 
                     name= {'lastName'}
                     value={this.state.lastName} 
-                    placeholder = {'Enter your last name'}
+                    placeholder = {'Enter your last name (required)'}
                     handleChange = {this.handleChange}
                     required={true}
                />
@@ -85,7 +159,7 @@ export default class form extends Component {
                     title= {'Email'} 
                     name= {'email'}
                     value={this.state.email} 
-                    placeholder = {'Enter your Email'}
+                    placeholder = {'Enter your Email (required)'}
                     handleChange = {this.handleChange}
                     required={true}
                />
