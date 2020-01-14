@@ -14,8 +14,8 @@ const Message =(props)=>{
     return (
         <div className='container'>
             <h1 style={msgStyle}>User Data Form</h1>
-            {(props.name !='')?<h2 style={msgSuccess}>Congratulation {props.name} !, your information has been saved!</h2>: <h2></h2>}
-            {(props.error)?<h6 style={{color:'red', textAlign:'center'}}>{props.error}</h6> : <h6></h6>}
+            {(props.name !=='')?<h2 style={msgSuccess}>Congratulations {props.name}!Your information has been saved.</h2>:  <div></div>}
+            {(props.error)?<h6 style={{color:'red', textAlign:'center'}}>{props.error}</h6> : <div></div>}
           <br></br>  
         </div>
     )
