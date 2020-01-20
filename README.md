@@ -3,7 +3,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ![Screen Shot 2020-01-19 at 9 26 22 PM](https://user-images.githubusercontent.com/38701679/72694274-7230de00-3b02-11ea-8128-6d768c845728.png)
 
-This is a fullstack react js form connected to MongoDb Database through Node JS server using rest Api. It has validations set up for first name,last name and email.
+This is a fullstack react js form connected to MongoDb Database through Node JS server using rest Api. It has validations set up for first name,last name and email.Styling is done using Bootstrap 4.
 
 
 ## Available Scripts
