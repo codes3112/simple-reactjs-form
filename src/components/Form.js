@@ -1,37 +1,30 @@
-import React, { Component } from 'react';
+import React, {useState} from 'react';
 import Input from './Input';
 import Button from './Button';
 import axios from 'axios';
 
-export default class form extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            employee:{
+const Form =(props) => {
+
+const [employee, setEmployee] = useState({
                 firstName:'',
                 lastName:'',
                 email:'',
                 empId:'',
                 city:''
-            },
-            message:{
-                name:'',
-                error:''
-            },
-            emailIsValid:false
+
+    });
+const [message, setMessage] = useState({
+        name:'',
+        error:'' 
+    })
+const [emailIsValid, setEmailIsValid] = useState(false);        
         
-        }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleClear= this.handleClear.bind(this);
-        this.handleChange= this.handleChange.bind(this);
-        this.sendData=this.sendData.bind(this);
         
-    }
-    sendData = (message) => {
-        this.props.callBackFromParent(message);
+const sendData = (message) => {
+        props.callBackFromParent(message);
    }
     
-    handleChange=(e)=>{
+const handleChange=(e)=>{
         // let name= e.target.name;
         // let value= e.target.value;
         const validEmailRegex = 
@@ -39,39 +32,31 @@ export default class form extends Component {
         const {name,value}=e.target;
         console.log("name:",name,"value:", value, "email test", validEmailRegex.test(value));
         
-        this.setState( prevState => {
-            return { 
-               employee : {
-                        ...prevState.employee, [name]: value
-                       }
-            }
-         });
-        // this.setState({
-        //     [name]:value
-        // });
-        let message = {...this.state.message}
+        setEmployee({...employee,[name]:value});
+        console.log("check setEmployee: ", employee)
+
                 switch (name) {
                         case 'firstName': 
                         
                         message.error=value.length<2 ? 'You First Name must be atleast 2 characters' : ''
-                        this.setState({message});
-                        this.sendData(message);
+                        setMessage({...message,message});
+                        sendData(message);
             
                         break;
                         case 'lastName': 
                         
                         //this.sendData({error:'You First Name must be atleast 2 characters'}):this.sendData({error:''})
                         message.error= value.length<2 ?'You Last Name must be atleast 2 characters' : ''
-                        this.setState({message});
-                        this.sendData(message);
+                        setMessage({...message,message});
+                        sendData(message);
                         break;
                         case 'email': 
                         
                         //this.sendData('Please enter valid Email'):this.sendData('')
                         message.error= !validEmailRegex.test(value)?'Please enter valid Email' : ''
-                        validEmailRegex.test(value)? this.setState({emailIsValid:true}) : this.setState({emailIsValid:false})
-                        this.setState({message});
-                        this.sendData(message);
+                        validEmailRegex.test(value)? setEmailIsValid(true) : setEmailIsValid(false)
+                        setMessage({...message,message});
+                        sendData(message);
                         break;
                         default:
                         break;
@@ -80,37 +65,36 @@ export default class form extends Component {
 
     }
     
-    handleSubmit = (e)=>{
+const handleSubmit = (e)=>{
         
         e.preventDefault();
-        let message = {...this.state.message}
         
-        if(this.state.employee.firstName.length>=2 && this.state.employee.lastName.length>=2 && this.state.emailIsValid){
-            message.name= this.state.employee.firstName;
+        if(employee.firstName.length>=2 && employee.lastName.length>=2 && emailIsValid){
+            message.name= employee.firstName;
             message.error='';
-            this.sendData(message);
-            let employee = this.state.employee;
+            sendData(message);
+            //send post request to node-express server
             axios.post(`http://localhost:3001/api`, employee )
                 .then(res => {
             console.log(res);
             console.log(res.data);
       })
-            this.handleClear(e);
+            handleClear(e);
         }else{
-            console.log("Check Submission name:",this.state.employee.firstName>=2,"lastname",this.state.employee.lastName>=2,"email", this.state.employee.emailIsValid)
-            if(this.state.employee.firstName.length<2){
+            //console.log("Check Submission name:",employee.firstName>=2,"lastname",employee.lastName>=2,"email", employee.emailIsValid)
+            if(employee.firstName.length<2){
                 message.error= "Error: You must enter your First Name "; 
-                this.setState({message});
-                this.sendData(message); 
+                setMessage({...message,message});
+                sendData(message); 
             }
-            else if(this.state.employee.lastName.length<2){
+            else if(employee.lastName.length<2){
                 message.error= "Error: You must enter your Last Name "; 
-                this.setState({message});
-                this.sendData(message); 
-            }else if(!this.state.employee.emailIsValid){
+                setMessage({...message,message});
+                sendData(message); 
+            }else if(!emailIsValid){
                 message.error= "Error: You must enter a valid Email "; 
-                this.setState({message});
-                this.sendData(message); 
+                setMessage({...message,message});
+                sendData(message); 
             }
             
             
@@ -119,39 +103,36 @@ export default class form extends Component {
         
 
     }
-    handleClear = (e)=>{
+const handleClear = (e)=>{
         e.preventDefault();
-        this.setState({
-            employee:{
+        setEmployee({
             firstName:'',
             lastName:'',
             email:'',
             empId:'',
             city:''
-            },
-            message:{
+            });
+        setMessage({
                 name:'',
                 error:''
-            },
-            emailIsValid:false
-        });
+            });
+        setEmailIsValid(false);
 
     }
     
-    render() {
-        console.log("props in Form:", this.props)
+        //console.log("props in Form:", props)
         return (
             <div>
                 {/* First Name */}
-                <form className="container" onSubmit={this.handleSubmit} className="col-lg-6 offset-lg-3">
+                <form className="container" onSubmit={handleSubmit} className="col-lg-6 offset-lg-3">
    
                 <Input
                     type={'text'}
                     title= {'First Name'} 
                     name= {'firstName'}
-                    value={this.state.employee.firstName} 
+                    value={employee.firstName} 
                     placeholder = {'Enter your first name (required)'}
-                    handleChange = {this.handleChange}
+                    handleChange = {handleChange}
                     required={true}
                />
                 {/* Last Name */}
@@ -159,9 +140,9 @@ export default class form extends Component {
                     type={'text'}
                     title= {'Last Name'} 
                     name= {'lastName'}
-                    value={this.state.employee.lastName} 
+                    value={employee.lastName} 
                     placeholder = {'Enter your last name (required)'}
-                    handleChange = {this.handleChange}
+                    handleChange = {handleChange}
                     required={true}
                />
                 {/* Employee Id  */}
@@ -169,9 +150,9 @@ export default class form extends Component {
                     type={'number'}
                     title= {'Employee ID'} 
                     name= {'empId'}
-                    value={this.state.employee.empId} 
+                    value={employee.empId} 
                     placeholder = {'Enter your Employee Id'}
-                    handleChange = {this.handleChange}
+                    handleChange = {handleChange}
                     required={true}
                />
                 {/* email */}
@@ -179,9 +160,9 @@ export default class form extends Component {
                     type={'email'}
                     title= {'Email'} 
                     name= {'email'}
-                    value={this.state.employee.email} 
+                    value={employee.email} 
                     placeholder = {'Enter your Email (required)'}
-                    handleChange = {this.handleChange}
+                    handleChange = {handleChange}
                     required={true}
                />
                 {/* City */}
@@ -189,18 +170,18 @@ export default class form extends Component {
                     type={'text'}
                     title= {'City'} 
                     name= {'city'}
-                    value={this.state.employee.city} 
+                    value={employee.city} 
                     placeholder = {'Enter your City'}
-                    handleChange = {this.handleChange}
+                    handleChange = {handleChange}
                     required={false}
                />
 
 
-                <Button title={'Submit'} action={this.handleSubmit} type={'primary'}/>&nbsp;&nbsp;&nbsp;&nbsp;
-                <Button title={'Clear'} action={this.handleClear} type={'warning'}/>
+                <Button title={'Submit'} action={handleSubmit} type={'primary'}/>&nbsp;&nbsp;&nbsp;&nbsp;
+                <Button title={'Clear'} action={handleClear} type={'warning'}/>
                 </form>
                
             </div>
         )
     }
-}
+export default Form;
